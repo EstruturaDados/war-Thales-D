@@ -237,7 +237,7 @@ int main() {
                 printf("❌ Um território não pode atacar a si mesmo!\n");
                 continue;
             }
-
+            
             atacar(&mapa[idxAtacante - 1], &mapa[idxDefensor - 1]);
         }
 
