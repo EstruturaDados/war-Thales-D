@@ -116,7 +116,7 @@ void atacar(Territorio *atacante, Territorio *defensor) {
            defensor->nome, defensor->corExercito);
 
     // Verifica se atacante tem tropas suficientes
-    if (atacante->quantidadeTropas <= 1) {
+    if (atacante->quantidadeTropas < 1) {
         printf("%s não pode atacar — possui apenas %d tropa(s)!\n",
                atacante->nome, atacante->quantidadeTropas);
         return;
@@ -127,7 +127,7 @@ void atacar(Territorio *atacante, Territorio *defensor) {
     int dadoAtacante = (rand() % 6) + 1;
     int dadoDefensor = (rand() % 6) + 1;
 
-    printf("Dado Atacante: %d | Dado Defensor: %d\n",
+    printf("\nDado Atacante: %d | Dado Defensor: %d\n",
            dadoAtacante, dadoDefensor);
 
     // Determina o vencedor
@@ -161,8 +161,8 @@ void exibirTerritorios(Territorio *mapa, int n) {
     printf("\n=== ESTADO ATUAL DOS TERRITÓRIOS ===\n");
     for (int i = 0; i < n; i++) {
         printf("\nTerritório %d:\n", i + 1);
-        printf("  Nome: %s\n", mapa[i].nome);
-        printf("  Cor do Exército: %s\n", mapa[i].corExercito);
+        printf("  Nome: %s", mapa[i].nome);
+        printf("  Cor do Exército: %s", mapa[i].corExercito);
         printf("  Tropas: %d\n", mapa[i].quantidadeTropas);
     }
     printf("=====================================\n");
@@ -171,7 +171,7 @@ void exibirTerritorios(Territorio *mapa, int n) {
 // Função para liberar a memória alocada dinamicamente
 void liberarMemoria(Territorio *mapa) {
     free(mapa);
-    printf("\n💾 Memória liberada com sucesso.\n");
+    printf("\nMemória liberada com sucesso.\n");
 }
 
 int main() {
@@ -194,13 +194,13 @@ int main() {
     printf("\n=== Cadastro de Territórios ===\n");
     for (int i = 0; i < n; i++) {
         printf("\n--- Território %d ---\n", i + 1);
-        printf("Nome: ");
+        printf("Nome do Território: ");
         fgets(mapa[i].nome, sizeof(mapa[i].nome), stdin);
-        removerNovaLinha(mapa[i].nome);
+        //removerNovaLinha(mapa[i].nome);
 
         printf("Cor do Exército: ");
         fgets(mapa[i].corExercito, sizeof(mapa[i].corExercito), stdin);
-        removerNovaLinha(mapa[i].corExercito);
+        //removerNovaLinha(mapa[i].corExercito);
 
         printf("Quantidade de Tropas: ");
         scanf("%d", &mapa[i].quantidadeTropas);
@@ -234,7 +234,7 @@ int main() {
             }
 
             if (idxAtacante == idxDefensor) {
-                printf("❌ Um território não pode atacar a si mesmo!\n");
+                printf("Um território não pode atacar a si mesmo!\n");
                 continue;
             }
             
