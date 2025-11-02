@@ -174,6 +174,40 @@ void liberarMemoria(Territorio *mapa) {
     printf("\nMemória liberada com sucesso.\n");
 }
 
+// === MISSÕES ===
+
+// Atribui uma missão aleatória a um jogador
+void atribuirMissao(char *destino, char *missoes[], int totalMissoes) {
+    int indice = rand() % totalMissoes;
+    strcpy(destino, missoes[indice]);
+}
+
+// Verifica se a missão foi cumprida (lógica simplificada)
+int verificarMissao(char *missao, Territorio *mapa, int tamanho) {
+    if (strstr(missao, "3 territórios")) {
+        // Missão: controlar 3 territórios seguidos
+        int cont = 0;
+        for (int i = 0; i < tamanho; i++) {
+            if (strcmp(mapa[i].corExercito, "Azul\n") == 0)
+                cont++;
+        }
+        if (cont >= 3)
+            return 1;
+    }
+    else if (strstr(missao, "tropas vermelhas")) {
+        // Missão: eliminar tropas da cor vermelha
+        int existeVermelho = 0;
+        for (int i = 0; i < tamanho; i++) {
+            if (strcmp(mapa[i].corExercito, "Vermelho\n") == 0)
+                existeVermelho = 1;
+        }
+        if (!existeVermelho)
+            return 1;
+    }
+    // Pode adicionar mais condições conforme as missões criadas
+    return 0;
+}
+
 int main() {
 
     srand(time(NULL)); // Inicializa o gerador de números aleatórios
@@ -186,8 +220,6 @@ int main() {
     // Alocação dinâmica com calloc
     Territorio *mapa = (Territorio *) calloc(n, sizeof(Territorio));
 
-    int i;
-
     //printf("=== Cadastro de Territórios ===\n\n");
 
      // Cadastro dos territórios
@@ -196,17 +228,30 @@ int main() {
         printf("\n--- Território %d ---\n", i + 1);
         printf("Nome do Território: ");
         fgets(mapa[i].nome, sizeof(mapa[i].nome), stdin);
-        //removerNovaLinha(mapa[i].nome);
 
         printf("Cor do Exército: ");
         fgets(mapa[i].corExercito, sizeof(mapa[i].corExercito), stdin);
-        //removerNovaLinha(mapa[i].corExercito);
 
         printf("Quantidade de Tropas: ");
         scanf("%d", &mapa[i].quantidadeTropas);
         getchar();
     }
+    // === Criação do vetor de missões ===
+    char *missoes[] = {
+        "Conquistar 3 territórios seguidos",
+        "Eliminar todas as tropas vermelhas",
+        "Controlar todos os territórios com mais de 5 tropas",
+        "Ter o dobro de territórios do inimigo",
+        "Dominar o mapa inteiro"
+    };
+    int totalMissoes = 5;
 
+    // === Sorteio e alocação dinâmica da missão do jogador ===
+    char *missaoJogador = (char *) malloc(100 * sizeof(char));
+    atribuirMissao(missaoJogador, missoes, totalMissoes);
+
+    printf("\n🎯 Sua missão é: %s\n", missaoJogador);
+    
     int opcao;
     do {
         exibirTerritorios(mapa, n);
