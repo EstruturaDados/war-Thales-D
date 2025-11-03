@@ -182,31 +182,78 @@ void atribuirMissao(char *destino, char *missoes[], int totalMissoes) {
     strcpy(destino, missoes[indice]);
 }
 
-// Verifica se a missão foi cumprida (lógica simplificada)
+// Verifica se a missão foi cumprida
 int verificarMissao(char *missao, Territorio *mapa, int tamanho) {
-    if (strstr(missao, "3 territórios")) {
-        // Missão: controlar 3 territórios seguidos
-        int cont = 0;
+
+    const char *corJogador = "Azul\n";
+    const char *corInimigo = "Vermelho\n";
+
+    // === Missão 1: Conquistar 3 territórios seguidos ===
+    if (strstr(missao, "Conquistar 3 territórios seguidos")==0) {
+        int consecutivos  = 0;
         for (int i = 0; i < tamanho; i++) {
-            if (strcmp(mapa[i].corExercito, "Azul\n") == 0)
-                cont++;
+            if (strcmp(mapa[i].corExercito, corJogador) == 0) {
+                consecutivos ++;
+                if (consecutivos  >= 3)
+                    return 1; //missão cumprida
+            } else {
+                consecutivos = 0; // reinicia contagem
+            }
         }
-        if (cont >= 3)
-            return 1;
+        return 0;
     }
-    else if (strstr(missao, "tropas vermelhas")) {
-        // Missão: eliminar tropas da cor vermelha
-        int existeVermelho = 0;
+
+    // === Missão 2: Eliminar todas as tropas vermelhas ===
+    else if (strcmp(missao, "Eliminar todas as tropas vermelhas") == 0) {
         for (int i = 0; i < tamanho; i++) {
-            if (strcmp(mapa[i].corExercito, "Vermelho\n") == 0)
-                existeVermelho = 1;
+            if (strcmp(mapa[i].corExercito, corInimigo) == 0) {
+                return 0; // ainda existe inimigo vermelho
+            }
         }
-        if (!existeVermelho)
-            return 1;
+        return 1; // nenhum território vermelho restante
     }
-    // Pode adicionar mais condições conforme as missões criadas
+   
+     // === Missão 3: Controlar todos os territórios com mais de 5 tropas ===
+    else if (strcmp(missao, "Controlar todos os territórios com mais de 5 tropas") == 0) {
+        for (int i = 0; i < tamanho; i++) {
+            if (mapa[i].quantidadeTropas > 5 &&
+                strcmp(mapa[i].corExercito, corJogador) != 0) {
+                return 0; // há território com mais de 5 tropas que não é do jogador
+            }
+        }
+        return 1; // todos os territórios fortes são do jogador
+    }
+
+    // === Missão 4: Ter o dobro de territórios do inimigo ===
+    else if (strcmp(missao, "Ter o dobro de territórios do inimigo") == 0) {
+        int totalJogador = 0, totalInimigo = 0;
+        for (int i = 0; i < tamanho; i++) {
+            if (strcmp(mapa[i].corExercito, corJogador) == 0)
+                totalJogador++;
+            else if (strcmp(mapa[i].corExercito, corInimigo) == 0)
+                totalInimigo++;
+        }
+
+        // Se inimigo tiver 0 territórios, missão também é considerada cumprida
+        if (totalInimigo == 0 || totalJogador >= 2 * totalInimigo)
+            return 1;
+        else
+            return 0;
+    }
+
+    // === Missão 5: Dominar o mapa inteiro ===
+    else if (strcmp(missao, "Dominar o mapa inteiro") == 0) {
+        for (int i = 0; i < tamanho; i++) {
+            if (strcmp(mapa[i].corExercito, corJogador) != 0)
+                return 0; // ainda há territórios de outra cor
+        }
+        return 1; // todos os territórios são do jogador
+    }
+
+    // Caso a missão não corresponda a nenhuma das acima
     return 0;
 }
+
 
 int main() {
 
@@ -248,9 +295,10 @@ int main() {
 
     // === Sorteio e alocação dinâmica da missão do jogador ===
     char *missaoJogador = (char *) malloc(100 * sizeof(char));
+
     atribuirMissao(missaoJogador, missoes, totalMissoes);
 
-    printf("\n🎯 Sua missão é: %s\n", missaoJogador);
+    printf("\nSua missão é: %s\n", missaoJogador);
     
     int opcao;
     do {
@@ -284,11 +332,22 @@ int main() {
             }
             
             atacar(&mapa[idxAtacante - 1], &mapa[idxDefensor - 1]);
+
+            // Após cada ataque, verifica se a missão foi cumprida
+            // Após cada ataque, verifica se a missão foi cumprida
+            if (verificarMissao(missaoJogador, mapa, n)) {
+                printf("\nMISSÃO CUMPRIDA! Você venceu o jogo!\n");
+                break;
+            } else {
+                printf("\nVocê ainda não cumpriu sua missão! Volte a LUTAR!");
+                printf("\nSua missão é: %s\n", missaoJogador);
+            }
         }
 
     } while (opcao != 0);
 
     liberarMemoria(mapa);
+    free(missaoJogador);
     printf("\nPrograma encerrado.\n");
     return 0;
 }
